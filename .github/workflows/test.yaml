@@ -1,0 +1,35 @@
+
+name: Deploy via OIDC to AWS
+
+on:
+  push:
+    branches: [ "master" ]
+
+permissions:
+  id-token: write    # REQUIRED for OIDC
+  contents: read     # usually needed to checkout
+  # (add other permissions as needed, e.g. packages, actions)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::190660836704:role/oidc_terraform
+          aws-region: ap-south-1
+          role-session-name: github-actions-oidc
+          # optional, defaults to sts.amazonaws.com:
+          audience: sts.amazonaws.com
+
+      - name: Verify identity
+        run: aws sts get-caller-identity
+
+      # Example: use AWS CLI
+      - name: List S3 buckets
+        run: aws s3 ls
