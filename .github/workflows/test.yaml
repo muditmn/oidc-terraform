@@ -27,9 +27,6 @@ jobs:
           # optional, defaults to sts.amazonaws.com:
           audience: sts.amazonaws.com
 
-      - name: Verify identity
-        run: aws sts get-caller-identity
-
       # Example: use AWS CLI
       - name: List S3 buckets
         run: aws s3 ls
