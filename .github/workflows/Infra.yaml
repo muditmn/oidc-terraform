@@ -31,7 +31,7 @@ jobs:
       - name: Checkout terraform modules
         uses: actions/checkout@v4
         with:
-          repository: muditmn/terraform-module          # owner/repo
+          repository: muditmn/terraform-module          
           ref: main                               # tag/branch/SHA
           token: ${{ secrets.PAT }} # Fine-grained PAT or GitHub App token
           path: terraform-module
