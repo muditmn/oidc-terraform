@@ -1,0 +1,62 @@
+
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # Required for OIDC
+      contents: read    # Required for actions/checkout
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::190660836704:role/oidc-terraform
+          aws-region: us-east-1
+
+      - name: Deploy
+        run: |
+          aws s3 ls
+      
+      
+      - name: Checkout terraform modules
+        uses: actions/checkout@v4
+        with:
+          repository: muditmn/terraform-module          # owner/repo
+          ref: main                               # tag/branch/SHA
+          token: ${{ secrets.PAT }} # Fine-grained PAT or GitHub App token
+          path: terraform-module
+
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+      # Installs Terraform CLI; wrapper outputs can be used later
+      # [7](https://github.com/marketplace/actions/hashicorp-setup-terraform)
+
+      - name: Terraform Init
+        run: terraform init -input=false
+        working-directory: terraform/Dev
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: terraform/Dev
+
+      - name: Terraform Plan (PRs)
+        if: github.event_name == 'pull_request'
+        run: terraform plan
+        working-directory: terraform/Dev
+      
+      - name: Terraform Apply (master)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: terraform apply -auto-approve -input=false
+        working-directory: terraform/Dev
+
