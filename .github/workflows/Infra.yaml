@@ -1,5 +1,5 @@
 
-name: Deploy to AWS
+name: Infra Deployment
 
 on:
   workflow_dispatch:
@@ -22,7 +22,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      
       - name: Resolve Account ID
         id: resolve
         run: |
@@ -32,7 +31,7 @@ jobs:
             Qa)   ACCOUNT_ID="111111111111" ;;
             Nonprod) ACCOUNT_ID="222222222222" ;;
             Prod)  ACCOUNT_ID="333333333333" ;;
-            Dev) echo "Invalid environment: $ENV" >&2; exit 1 ;;
+            *) echo "Invalid environment: $ENV" >&2; exit 1 ;;
           esac
           echo "account_id=$ACCOUNT_ID" >> $GITHUB_OUTPUT
 
@@ -64,6 +63,25 @@ jobs:
     steps:   
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Resolve Account ID
+        id: resolve
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
+          case "$ENV" in
+            Dev)   ACCOUNT_ID="190660836704" ;;
+            Qa)   ACCOUNT_ID="111111111111" ;;
+            Nonprod) ACCOUNT_ID="222222222222" ;;
+            Prod)  ACCOUNT_ID="333333333333" ;;
+            *) echo "Invalid environment: $ENV" >&2; exit 1 ;;
+          esac
+          echo "account_id=$ACCOUNT_ID" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ steps.resolve.outputs.account_id }}:role/oidc-terraform
+          aws-region: us-east-1
 
       - name: Checkout terraform modules
         uses: actions/checkout@v4
@@ -99,6 +117,25 @@ jobs:
     steps:      
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Resolve Account ID
+        id: resolve
+        run: |
+          ENV="${{ github.event.inputs.environment }}"
+          case "$ENV" in
+            Dev)   ACCOUNT_ID="190660836704" ;;
+            Qa)   ACCOUNT_ID="111111111111" ;;
+            Nonprod) ACCOUNT_ID="222222222222" ;;
+            Prod)  ACCOUNT_ID="333333333333" ;;
+            *) echo "Invalid environment: $ENV" >&2; exit 1 ;;
+          esac
+          echo "account_id=$ACCOUNT_ID" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ steps.resolve.outputs.account_id }}:role/oidc-terraform
+          aws-region: us-east-1
 
       - name: Checkout terraform modules
         uses: actions/checkout@v4
