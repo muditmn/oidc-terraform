@@ -3,7 +3,7 @@ terraform {
     bucket         = "s3bucket2backend"
     key            = "infra/dev.tfstate"
     region         = "ap-south-1"
-    dynamodb_table = "dev-tf-locks"
+    dynamodb_table = "Dev-tf-locks"
     encrypt        = true
   }
 }
