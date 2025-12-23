@@ -59,6 +59,9 @@ jobs:
   Initilization:
     runs-on: ubuntu-latest
     needs: Authentication
+    permissions:
+      id-token: write
+      contents: read
 
     steps:   
       - name: Checkout
@@ -112,6 +115,9 @@ jobs:
   Deploying:
     runs-on: ubuntu-latest
     needs: Initilization
+    permissions:
+      id-token: write
+      contents: read
     environment: apply
     
     steps:      
