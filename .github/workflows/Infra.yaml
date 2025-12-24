@@ -10,6 +10,12 @@ on:
         default: 'Dev'
         type: choice
         options: [Dev, Qa, Nonprod, Prod]
+      terraform_action:
+        description: 'Terraform function to perform'
+        required: false
+        default: 'plan'
+        type: choice
+        options: [plan, apply, destroy]
 
 jobs:
   Authentication:
